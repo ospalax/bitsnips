@@ -1,0 +1,85 @@
+#
+# BUILDER STAGE
+#
+
+ARG UBUNTU_VERSION="22.04"
+
+FROM ubuntu:${UBUNTU_VERSION} AS builder
+
+ARG CISCO_FILE="CiscoPacketTracer_900_Ubuntu_64bit.deb"
+
+#
+# install binary and deps
+#
+
+WORKDIR /cisco
+
+# this creates a layer and so the binary blob will still be in the image
+# archive...
+#
+# so I will unpack this and throw away...
+
+COPY "${CISCO_FILE}" ./cisco_packettracer.deb
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ./cisco_packettracer.deb \
+    && apt-get clean && rm -rf /tmp/* /var/tmp/* \
+    rm -f ./cisco_packettracer.deb
+
+RUN /usr/local/bin/packettracer --appimage-extract \
+    && mv squashfs-root app
+
+#
+# SECOND STAGE
+#
+
+ARG UBUNTU_VERSION="22.04"
+
+FROM ubuntu:${UBUNTU_VERSION}
+LABEL maintainer="Petr Ospalý (osp) <petr@ospalax.cz>"
+
+ARG CISCO_FILE="CiscoPacketTracer_900_Ubuntu_64bit.deb"
+ARG BROWSER_APP="elinks" # change to epiphany
+
+#
+# setup the system
+#
+
+WORKDIR /cisco
+
+# get the artifact
+COPY --from=builder /cisco/app /cisco/app
+
+#
+# install deps
+#
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ca-certificates coreutils \
+    libopengl0 \
+    libnss3 \
+    libpulse0 \
+    libegl1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libxtst6 \
+    libxkbfile1 \
+    qt6-qpa-plugins \
+    locales \
+    ${BROWSER_APP} \
+    && apt-get clean && rm -rf /tmp/* /var/tmp/* \
+    rm -f ./cisco_packettracer.deb
+
+# Qt complains about locales...
+RUN locale-gen C.UTF-8 && update-locale LANG=C.UTF-8
+ENV LANG=C.UTF-8
+
+# Cisco will store the account login info and other stuff
+WORKDIR /home/cisco
+RUN chmod 1777 /home/cisco
+ENV HOME=/home/cisco
+
+CMD ["bash", "-c", "/cisco/app/AppRun"]
