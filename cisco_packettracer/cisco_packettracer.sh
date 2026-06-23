@@ -119,7 +119,7 @@ case "$ACTION" in
             | gzip > "${ARCHIVE}"
         ;;
     load)
-        gzip -d "${ARCHIVE}" | ${DOCKER} image import - "${IMAGE}"
+        gzip -cd "${ARCHIVE}" | ${DOCKER} image import - "${IMAGE}"
         ;;
     run)
         ${DOCKER} run -it \
