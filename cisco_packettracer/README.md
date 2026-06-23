@@ -68,3 +68,55 @@ command - and it will be hidden behind the packettracer gui - so just switch
 the windows if you don't see any browser popping up!**
 
 ## Quick Start
+
+```
+NAME
+    cisco_packettracer.sh - tool to run cisco packettracer:
+
+        1. more safely inside the container
+        2. allows to run it on non-ubuntu distro
+
+SYNOPSIS
+    cisco_packettracer.sh [help]
+        This help
+
+    cisco_packettracer.sh build
+        build the image - can be modified with the following variables:
+
+        CISCO_FILE:
+            path to the cisco package (must be inside the same directory as the
+            Dockerfile...)
+
+            default=download/CiscoPacketTracer_900_Ubuntu_64bit.deb
+
+        UBUNTU_VERSION:
+            change as needed - read the cisco documentation
+
+            default=22.04
+
+        BROWSER_APP:
+            cisco will require to login via browser - this selects which
+            browser to install (terminal browsers work too...)
+
+            default=elinks
+
+    cisco_packettracer.sh save [ARCHIVE]
+        save the image to a archive - useful if you have ephemeral setup for
+        container storage...
+
+        ARCHIVE:
+            path to the archive - works as argument and env. variable
+
+            default=download/cisco_packettracer.tgz
+
+    cisco_packettracer.sh load [ARCHIVE]
+        load the saved image
+
+        ARCHIVE:
+            path to the archive - works as argument and env. variable
+
+            default=download/cisco_packettracer.tgz
+
+    cisco_packettracer.sh run
+        simply start the container with the app (it must be built or loaded...)
+```
