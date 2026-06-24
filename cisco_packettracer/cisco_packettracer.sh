@@ -8,6 +8,7 @@ DOCKER="${DOCKER:-podman}"
 IMAGE="${IMAGE:-cisco_packettracer}"
 ARCHIVE="${ARCHIVE:-download/${IMAGE}.tgz}"
 CISCO_FILE="${CISCO_FILE:-download/CiscoPacketTracer_900_Ubuntu_64bit.deb}"
+CISCO_STORE="${CISCO_STORE:-./ciscodata}"
 UBUNTU_VERSION="${UBUNTU_VERSION:-22.04}"
 BROWSER_APP="${BROWSER_APP:-elinks}" # more options in the README
 
@@ -85,13 +86,13 @@ case "$1" in
         ;;
     save)
         ACTION=save
-        if [ -z "$ARCHIVE" ]; then
+        if [ -n "$2" ]; then
             ARCHIVE="$2"
         fi
         ;;
     load)
         ACTION=load
-        if [ -z "$ARCHIVE" ]; then
+        if [ -n "$2" ]; then
             ARCHIVE="$2"
         fi
         ;;
@@ -106,31 +107,42 @@ esac
 
 case "$ACTION" in
     build)
+        set -x
         ${DOCKER} build \
             -t "${IMAGE}" \
             --build-arg CISCO_FILE="${CISCO_FILE}" \
             --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
             --build-arg BROWSER_APP="${BROWSER_APP}" \
             -f Dockerfile-cisco
+        set +x
         ;;
     save)
+        set -x
         ${DOCKER} image save \
             "${IMAGE}" \
             | gzip > "${ARCHIVE}"
+        set +x
         ;;
     load)
-        gzip -cd "${ARCHIVE}" | ${DOCKER} image import - "${IMAGE}"
+        set -x
+        gzip -cd "${ARCHIVE}" | ${DOCKER} image load
+        set +x
         ;;
     run)
+        set -x
+        CISCO_STORE=$(realpath "${CISCO_STORE}")
+        mkdir -p "${CISCO_STORE}"
         ${DOCKER} run -it \
             --userns keep-id \
             --env=XAUTHORITY="${XAUTHORITY}" \
             --env=DISPLAY="${DISPLAY}" \
             -v "/tmp/.X11-unix:/tmp/.X11-unix:ro" \
             -v "${XAUTHORITY}:${XAUTHORITY}:ro" \
+            -v "${CISCO_STORE}:/home/cisco" \
             --security-opt label=type:container_runtime_t \
             --env=LANG="C.UTF-8" \
             "${IMAGE}"
+        set +x
         ;;
 esac
 
