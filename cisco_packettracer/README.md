@@ -1,12 +1,16 @@
 # cisco_packettracer
 
+*(I wrote about this on [my website](https://www.ospalax.cz/things/scripts/cisco_packettracer/).)*
+
 The cisco **packettracer** is needed for the following course:
-- https://www.netacad.com/courses/getting-started-cisco-packet-tracer?courseLang=en-US
+
+- [https://www.netacad.com/courses/getting-started-cisco-packet-tracer?courseLang=en-US](https://www.netacad.com/courses/getting-started-cisco-packet-tracer?courseLang=en-US)
 
 The application is free to download here (if the link changes try to search for it...):
-- https://www.netacad.com/resources/lab-downloads?courseLang=en-US
 
-They provide only [ubuntu](https://ubuntu.com) package and I definitely don't
+- [https://www.netacad.com/resources/lab-downloads?courseLang=en-US](https://www.netacad.com/resources/lab-downloads?courseLang=en-US)
+
+They provide only [Ubuntu](https://ubuntu.com) package and I definitely don't
 want to run this bloat directly on my machine even if I was ubuntu user.
 
 **I made this so I can run the program on any linux inside a container.**
@@ -28,6 +32,10 @@ So that is reflected in how this thing is used:
 1. run container (from the image)
 
 ## Important (!)
+
+**UPDATE**: I have no clue why but this stopped working and cisco never tries
+to open any browser anymore... Luckily you can use internal embedded browser
+(uff).
 
 Cisco requires you to login upon the start of that thing and it will try to open browser (any browser):
 

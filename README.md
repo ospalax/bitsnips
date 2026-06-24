@@ -5,4 +5,4 @@ I&nbsp;don't want to run directly...
 
 ## Index
 
-* cisco_packettracer
+* [cisco_packettracer](https://www.ospalax.cz/things/scripts/cisco_packettracer/) (link to the article on my website)
